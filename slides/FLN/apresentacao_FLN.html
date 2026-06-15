@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Apresentacao FLN - Fluxo Mensal</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0a0f1e;
+  overflow: hidden;
+  height: 100vh;
+}
+#presentation {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+#slides-container {
+  width: 914px;
+  height: 514px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  transform: scale(1.2);
+  transform-origin: center center;
+}
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: white;
+  padding: 24px 30px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+.slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.slide.cover { padding: 0; }
+.slide.cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #002D72;
+  flex-shrink: 0;
+}
+.header .title { font-size: 20px; font-weight: 700; color: #1a1a2e; letter-spacing: -.5px; }
+.header .subtitle { font-size: 11px; color: #64748b; margin-top: 2px; }
+.badge {
+  background: #002D72;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.tables-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.tables-col {
+  flex: 0 0 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+.bullet-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.bullet-area {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.bullet-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+.bullet-list { list-style: none; padding: 0; }
+.bullet-list li {
+  font-size: 11px;
+  color: #334155;
+  padding: 3px 0 3px 16px;
+  position: relative;
+  line-height: 1.4;
+}
+.bullet-list li::before { content: '•'; position: absolute; left: 3px; color: #1a1a2e; font-weight: 700; }
+.bullet-list li.empty { color: #cbd5e1; font-style: italic; }
+.bullet-area-full {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 8px;
+}
+.bullet-area-full .bullet-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+.bullet-area-full .bullet-list li {
+  font-size: 14px;
+  color: #334155;
+  padding: 6px 0 6px 20px;
+  position: relative;
+  line-height: 1.5;
+}
+.bullet-area-full .bullet-list li::before { content: '•'; position: absolute; left: 4px; color: #002D72; font-weight: 700; font-size: 16px; }
+.bullet-area-full .bullet-list li strong { color: #002D72; }
+.graph-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.pizza-slide .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+}
+.pizza-slide .chart-container {
+  width: 340px;
+  height: 300px;
+  position: relative;
+}
+.pizza-slide .chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.pizza-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  justify-content: center;
+  max-width: 700px;
+}
+.pizza-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #334155;
+}
+.pizza-legend-item .dot-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.status-slide .content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+.status-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+  flex: 1;
+}
+.status-chart-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 6px 6px;
+}
+.status-chart-cell canvas {
+  width: 100% !important;
+  height: 130px !important;
+}
+.status-chart-cell .emp-name {
+  font-size: 8px;
+  font-weight: 700;
+  color: #002D72;
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: .3px;
+}
+.highlights-slide .content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+.highlights-slide table { width: 100%; border-collapse: collapse; font-size: 1.1em; }
+.highlights-slide th { background: #002D72; color: white; padding: 10px 16px; text-align: left; }
+.highlights-slide td { padding: 10px 16px; border-bottom: 1px solid #eee; }
+.highlights-slide td.saldo-pos { color: #16a34a; font-weight: bold; }
+.highlights-slide td.saldo-neg { color: #dc2626; font-weight: bold; }
+.graph-card {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+.graph-card canvas { width: 100% !important; height: 130px !important; }
+.graph-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.graph-legend span { font-size: 8px; font-weight: 700; letter-spacing: .5px; }
+.graph-legend .leg-tir { color: #002D72; }
+.graph-legend .leg-roi { color: #FF5A4F; }
+.graph-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.table-block { width: 100%; }
+.table-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  margin-bottom: 5px;
+  padding-left: 2px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+thead th {
+  background: #002D72;
+  color: white;
+  padding: 5px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: .3px;
+}
+thead th:first-child { text-align: left; }
+tbody td {
+  padding: 4px 8px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 10px;
+}
+tbody td:first-child { text-align: left; font-weight: 600; color: #334155; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:nth-child(even) { background: #f8fafc; }
+.positive { color: #FF5A4F; font-weight: 600; }
+.negative { color: #002D72; font-weight: 600; }
+.aporte-val { color: #FF5A4F; font-weight: 600; }
+.reimb-val { color: #16a34a; font-weight: 600; }
+.agio-val { color: #002D72; font-weight: 600; }
+.saldo-pos { color: #16a34a; font-weight: 600; }
+.saldo-neg { color: #FF5A4F; font-weight: 600; }
+.zero { color: #94a3b8; }
+.bullet-area {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+.bullet-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.bullet-list { list-style: none; padding: 0; }
+.bullet-list li {
+  font-size: 11px;
+  color: #334155;
+  padding: 2px 0 2px 16px;
+  position: relative;
+  line-height: 1.4;
+}
+.bullet-list li::before { content: '•'; position: absolute; left: 3px; color: #1a1a2e; font-weight: 700; }
+.bullet-list li.empty { color: #cbd5e1; font-style: italic; }
+#dots {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+  z-index: 100;
+}
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #334155;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.dot.active { background: #002D72; transform: scale(1.4); }
+.dot:hover { background: #5a8fff; }
+#counter {
+  position: fixed;
+  bottom: 16px;
+  right: 22px;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+  z-index: 100;
+}
+</style>
+</head>
+<body>
+<script src="chartjs_local.js"></script>
+<div id="presentation">
+  <div id="slides-container">
+
+<div class="slide cover" id="slide-cover1"><img src="cover1.png"></div><div class="slide cover" id="slide-cover2"><img src="cover2.png"></div>    <div class="slide pizza-slide" id="slide-pizza">
+      <div class="header">
+        <div class="title">Volume de vendas no mês de Maio = 55</div>
+        <div class="subtitle">Quantidade total de investimentos — FLN</div>
+        <div class="badge">FLN</div>
+      </div>
+      <div class="content">
+        <div class="chart-container">
+          <canvas id="pizza-canvas"
+            data-labels="%5B%22Ponta%20das%20Canas%20Spot%20II%22%2C%22Natal%20Spot%22%2C%22Itacar%C3%A9%20Spot%22%2C%22Jurer%C3%AA%20Spot%20III%22%2C%22Novo%20Campeche%20Spot%20II%22%2C%22Marista%20144%20Spot%22%2C%22Caragu%C3%A1%20Spot%22%2C%22Jurer%C3%AA%20Spot%20II%22%5D"
+            data-vals="%5B17%2C9%2C9%2C8%2C4%2C3%2C3%2C2%5D"
+            data-colors="%5B%22%23002D72%22%2C%22%23FF5A4F%22%2C%22%2316a34a%22%2C%22%23f59e0b%22%2C%22%238b5cf6%22%2C%22%2306b6d4%22%2C%22%23ec4899%22%2C%22%23f97316%22%5D"></canvas>
+        </div>
+        <div class="pizza-legend">
+          <div class="pizza-legend-item"><div class="dot-color" style="background:#002D72"></div>Ponta das Canas Spot II <strong>(17)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#FF5A4F"></div>Natal Spot <strong>(9)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#16a34a"></div>Itacaré Spot <strong>(9)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#f59e0b"></div>Jurerê Spot III <strong>(8)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#8b5cf6"></div>Novo Campeche Spot II <strong>(4)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#06b6d4"></div>Marista 144 Spot <strong>(3)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#ec4899"></div>Caraguá Spot <strong>(3)</strong></div><div class="pizza-legend-item"><div class="dot-color" style="background:#f97316"></div>Jurerê Spot II <strong>(2)</strong></div>
+        </div>
+      </div>
+    </div>    <div class="slide status-slide" id="slide-status">
+      <div class="header">
+        <div class="title">Status Geral por Empreendimento</div>
+        <div class="subtitle">Disponível / Reservada / Contrato / Vendida — FLN</div>
+        <div class="badge">FLN</div>
+      </div>
+      <div class="content">
+        <table>
+          <thead>
+            <tr>
+              <th>Empreendimento</th>
+              <th>Disponível</th>
+              <th>Reservada</th>
+              <th>Contrato</th>
+              <th>Vendida</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Natal Spot</td><td>29</td><td>1</td><td>0</td><td>63</td><td><strong>93</strong></td></tr><tr><td>Itacare Spot</td><td>16</td><td>0</td><td>0</td><td>51</td><td><strong>67</strong></td></tr><tr><td>Novo Campeche Spot II</td><td>24</td><td>0</td><td>0</td><td>27</td><td><strong>51</strong></td></tr><tr><td>Marista 144 Spot</td><td>52</td><td>0</td><td>0</td><td>98</td><td><strong>150</strong></td></tr><tr><td>Bonito Spot II</td><td>15</td><td>0</td><td>0</td><td>20</td><td><strong>35</strong></td></tr><tr><td>Barra Grande Spot</td><td>1</td><td>0</td><td>0</td><td>59</td><td><strong>60</strong></td></tr><tr><td>Caragua Spot</td><td>109</td><td>0</td><td>0</td><td>25</td><td><strong>134</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>    <div class="slide" id="slide-2"><div class="header"><div class="title">Marista 144 Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Não teve alteração.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5B4.92%2C4.96%2C3.97%2C3.9727%2C3.93%2C3.85%2C3.68%2C3.7549%2C3.67%2C3.52%2C3.27%2C3.09%2C3.04%2C2.96%2C2.96%5D" data-roi="%5B2.29%2C2.09%2C2.09%2C1.78%2C1.78%2C1.66%2C1.55%2C1.78%2C1.72%2C1.6%2C1.41%2C1.23%2C1.23%2C1.2%2C1.2%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-3"><div class="header"><div class="title">Jurere Beach Spot II</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 20%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 146.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 146.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 220.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 220.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 42.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 42.000</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 58.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 58.000</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Melhorou pelas mudanças de fluxo.</li><li>Adiantou reembolso.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5B5.94%2C3.57%2C3.84%2C3.0565%2C3.72%2C3.69%2C3.37%2C3.32%2C3.26%2C3.14%2C3.14%2C2.73%2C2.74%2C2.74%2C3.24%5D" data-roi="%5B3.31%2C1.49%2C1.58%2C1.13%2C1.74%2C1.88%2C2.18%2C1.97%2C2.14%2C1.92%2C2.03%2C1.74%2C1.75%2C1.6%2C2.14%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-4"><div class="header"><div class="title">Bonito Spot II</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 70.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 70.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 15.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 15.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 55.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 55.000</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 15.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 15.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 12.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 12.500</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 103.777,78</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 103.777,78</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Piora devido a velocidade de vendas.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2C6.27%2C5.1%2C4.59%2C4.4378%2C4.2%2C4.56%2C4.8%2C4%2C4%2C4.12%2C3.92%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2C3.59%2C3.75%2C4.54%2C3.85%2C3.43%2C3.91%2C3.84%2C2.87%2C2.87%2C2.87%2C2.75%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-5"><div class="header"><div class="title">Caragua Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 25%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Não teve alteração.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2C10.49%2C3.06%2C2.9%2C2.5658%2C1.94%2C0.55%2C0.54%2C0.49%2C0.62%2C0.55%2C0.56%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2C3.11%2C0.78%2C0.71%2C0.62%2C0.5%2C0.4%2C0.4%2C0.4%2C0.4%2C0.4%2C0.45%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-6"><div class="header"><div class="title">Barra Grande Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 25%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 10.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 10.000</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 10.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 10.000</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 51.250</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 51.250</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Não teve alteração.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2C4.86%2C3.53%2C3.44%2C3.9684%2C3.73%2C3.81%2C3.75%2C3.71%2C3.56%2C3.42%2C3.42%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2C2.5%2C1.8%2C1.75%2C2%2C1.9%2C2.19%2C2.38%2C2.38%2C2.38%2C2.38%2C2.38%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-7"><div class="header"><div class="title">Itacare Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 67.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 67.500</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 100.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 100.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 260.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 260.000</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 40.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 40.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 102.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 102.500</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 157.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 157.500</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Piora devido a velocidade de vendas.</li><li>Ajuste nas comissões para reduzir impactos.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2C4.79%2C3.67%2C3.22%2C2.4842%2C2.22%2C2.16%2C2.11%2C2.15%2C2.22%2C2.41%2C2.22%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2C3.64%2C2.27%2C1.88%2C1.37%2C1.25%2C1.18%2C1.02%2C1.01%2C1.05%2C1.31%2C1.14%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-8"><div class="header"><div class="title">Canas Beach Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 120.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 120.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 130.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 130.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 137.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 137.500</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 195.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 195.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 150.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 150.000</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 127.500</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 127.500</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Adiantamento de reembolso e ágio.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C6.25%2C6.4922%2C6.71%2C6.52%2C6.14%2C5.98%2C6.04%2C6.32%2C6.55%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C2.69%2C3.6%2C3.07%2C2.78%2C2.67%2C3.51%2C3.51%2C3.51%2C3.51%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-9"><div class="header"><div class="title">Novo Campeche</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="aporte-val">-R$ 140.000</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 140.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="aporte-val">-R$ 82.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 82.500</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="aporte-val">-R$ 67.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 67.500</td></tr><tr><td class="">ago/26</td><td class="aporte-val">-R$ 167.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 167.500</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Melhora devido ao remanejamento de custo.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C4.9836%2C5.63%2C4.68%2C4.47%2C4.49%2C5.1%2C4.75%2C4.95%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3.11%2C2.66%2C2.3%2C2.21%2C2.21%2C2.45%2C2.27%2C2.31%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-10"><div class="header"><div class="title">Natal Spot</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 45.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 45.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="aporte-val">-R$ 130.000</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 130.000</td></tr><tr><td class="">ago/26</td><td class="aporte-val">-R$ 42.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 42.500</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Erro no caixa, necessidade de aumento de aporte.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C6.9887%2C3.49%2C3.25%2C3.39%2C3.03%2C3.04%2C3.56%2C3.14%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C4.74%2C2.47%2C2.18%2C2.25%2C2.25%2C2.19%2C2.99%2C2.29%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-11"><div class="header"><div class="title">Novo Campeche II</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jun/26</td><td class="aporte-val">-R$ 472.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 472.500</td></tr><tr><td class="">jul/26</td><td class="aporte-val">-R$ 175.000</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 175.000</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="aporte-val">-R$ 470.000</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 470.000</td></tr><tr><td class="">jul/26</td><td class="aporte-val">-R$ 206.250</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 206.250</td></tr><tr><td class="">ago/26</td><td class="aporte-val">-R$ 107.500</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="saldo-pos">-R$ 107.500</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Piora devido a velocidade de vendas.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3.71%2C3.2%2C3.52%2C3.21%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C2.23%2C1.52%2C2.22%2C1.76%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-12"><div class="header"><div class="title">Jurere Spot III</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 50%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Melhora das vendas aumentou indicadores.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C7.76%2C6.64%2C6.27%2C5.71%2C7.16%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C2.53%2C2.01%2C1.87%2C1.85%2C2.55%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-13"><div class="header"><div class="title">Ponta das Canas Spot II</div><div class="subtitle">Fluxo mensal consolidado</div><div class="badge">FLN — 100%</div></div><div class="content"><div class="tables-row"><div class="tables-col"><div class="table-block"><div class="table-label">Snapshot B — Anterior (mai / jun / jul)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">mai/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 790.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 790.000</td></tr><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 370.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 370.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td><td class="zero">R$ 0</td></tr></tbody></table></div><div class="table-block"><div class="table-label">Snapshot A — Atual (jun / jul / ago)</div><table><thead><tr><th>Mes</th><th>Aporte</th><th>Reembolso</th><th>Agio</th><th>Saldo</th></tr></thead><tbody><tr><td class="">jun/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 865.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 865.000</td></tr><tr><td class="">jul/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 515.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 515.000</td></tr><tr><td class="">ago/26</td><td class="zero">R$ 0</td><td class="reimb-val">R$ 575.000</td><td class="zero">R$ 0</td><td class="saldo-pos">R$ 575.000</td></tr></tbody></table></div></div><div class="bullet-col"><div class="bullet-area"><div class="bullet-title">Destaques</div><ul class="bullet-list"><li>Piora das vendas reduziu indicadores.</li></ul></div></div></div><div class="graph-area"><div class="graph-card"><div class="graph-legend"><span class="leg-tir">TIR</span><span class="leg-roi">ROI</span></div><canvas data-labels="%5B%22abr%2F25%22%2C%22mai%2F25%22%2C%22jun%2F25%22%2C%22jul%2F25%22%2C%22ago%2F25%22%2C%22set%2F25%22%2C%22out%2F25%22%2C%22nov%2F25%22%2C%22dez%2F25%22%2C%22jan%2F26%22%2C%22fev%2F26%22%2C%22mar%2F26%22%2C%22abr%2F26%22%2C%22mai%2F26%22%2C%22jun%2F26%22%5D" data-tir="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C5.31%2C4.1625%2C3.74%2C3.93%2C3.58%2C3.78%2C3.74%2C3.54%2C4.05%5D" data-roi="%5Bnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C2.69%2C2.99%2C1.83%2C2.38%2C1.6%2C1.74%2C1.93%2C1.93%2C1.84%5D"></canvas></div></div></div></div>
+    <div class="slide" id="slide-cronograma">
+      <div class="header">
+        <div class="title">Cronograma Previsto</div>
+        <div class="subtitle">Próximos aportes</div>
+        <div class="badge">FLN</div>
+      </div>
+      <div class="content">
+        <div class="tables-row">
+          <div class="tables-col">
+            <div class="bullet-area-full">
+              <div class="bullet-title">Projetos com previsão de aporte</div>
+              <ul class="bullet-list">
+                <li><strong>Farol da Barra Spot</strong> — Previsão de aporte para <strong>R$ 75.000</strong> em <strong>julho/2026</strong>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="dots"><div class="dot" data-index="0"></div><div class="dot" data-index="1"></div><div class="dot" data-index="2"></div><div class="dot" data-index="3"></div><div class="dot" data-index="4"></div><div class="dot" data-index="5"></div><div class="dot" data-index="6"></div><div class="dot" data-index="7"></div><div class="dot" data-index="8"></div><div class="dot" data-index="9"></div><div class="dot" data-index="10"></div><div class="dot" data-index="11"></div><div class="dot" data-index="12"></div><div class="dot" data-index="13"></div><div class="dot" data-index="14"></div><div class="dot" data-index="15"></div><div class="dot" data-index="16"></div></div>
+  <div id="counter"><span id="current-num">1</span> / 17</div>
+</div>
+<script>
+const ptLabelPlugin = {
+  id: 'ptLabels',
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    if (chart.config.type === 'pie') return;
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach((pt, pi) => {
+        const val = ds.data[pi];
+        if (val == null) return;
+        const col = di === 0 ? '#002D72' : '#FF5A4F';
+        ctx.save();
+        ctx.font = 'bold 7px Segoe UI, Arial';
+        ctx.fillStyle = col;
+        ctx.textAlign = 'center';
+        ctx.fillText(val.toFixed(2) + '%', pt.x, pt.y - 7);
+        ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(ptLabelPlugin);
+const statusValuePlugin = {
+  id: 'statusValues',
+  afterDatasetsDraw(chart) {
+    if (chart.config.type !== 'bar' || !chart.options.indexAxis || chart.options.indexAxis !== 'y') return;
+    const { ctx } = chart;
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach((bar, pi) => {
+        const val = ds.data[pi];
+        if (!val) return;
+        const colors = ['#16a34a','#f59e0b','#002D72','#FF5A4F'];
+        ctx.save();
+        ctx.font = 'bold 8px Segoe UI, Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(val, bar.x - 12, bar.y);
+        ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(statusValuePlugin);
+
+
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.dot');
+const counter = document.getElementById('current-num');
+let current = 0;
+const total = slides.length;
+
+function show(idx) {
+  const slide = slides[idx];
+  const dot = dots[idx];
+  if (!slide || !dot) {
+    console.error('show failed: slide or dot not found', idx, slides.length, dots.length);
+    return;
+  }
+  slides.forEach(s => s.classList.remove('active'));
+  dots.forEach(d => d.classList.remove('active'));
+  slide.classList.add('active');
+  dot.classList.add('active');
+  counter.textContent = idx + 1;
+  current = idx;
+  initCharts(idx);
+}
+
+function initCharts(idx) {
+  const slide = slides[idx];
+  if (!slide) return;
+  if (slide._chartsInit) return;
+  slide._chartsInit = true;
+  slide.querySelectorAll('canvas').forEach(canvas => {
+    let labels, tirData, roiData;
+    try { labels = JSON.parse(decodeURIComponent(canvas.dataset.labels || 'W10=')); } catch(e) { labels = []; }
+    try { tirData = JSON.parse(decodeURIComponent(canvas.dataset.tir || 'W10=')); } catch(e) { tirData = []; }
+    try { roiData = JSON.parse(decodeURIComponent(canvas.dataset.roi || 'W10=')); } catch(e) { roiData = []; }
+    new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'TIR',
+            data: tirData,
+            borderColor: '#002D72',
+            backgroundColor: 'rgba(0,45,114,0.06)',
+            borderWidth: 2,
+            pointRadius: 2.5,
+            pointBackgroundColor: '#002D72',
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: 'ROI',
+            data: roiData,
+            borderColor: '#FF5A4F',
+            backgroundColor: 'rgba(255,90,79,0.06)',
+            borderWidth: 2,
+            pointRadius: 2.5,
+            pointBackgroundColor: '#FF5A4F',
+            tension: 0.4,
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + '%'
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { font: { size: 8 }, color: '#94a3b8', maxRotation: 0 }, grid: { display: false } },
+          y: { ticks: { font: { size: 8 }, color: '#94a3b8', callback: v => v.toFixed(1) + '%' }, grid: { color: '#f1f5f9' } }
+        }
+      }
+    });
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Pizza chart (slide index 2)
+  const pizzaCanvas = document.getElementById('pizza-canvas');
+  if (pizzaCanvas) {
+    const labels = JSON.parse(decodeURIComponent(pizzaCanvas.dataset.labels || '[]'));
+    const vals   = JSON.parse(decodeURIComponent(pizzaCanvas.dataset.vals || '[]'));
+    const colors = JSON.parse(decodeURIComponent(pizzaCanvas.dataset.colors || '[]'));
+    new Chart(pizzaCanvas.getContext('2d'), {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{
+          data: vals,
+          backgroundColor: colors,
+          borderWidth: 1.5,
+          borderColor: '#ffffff',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+        }
+      }
+    });
+  }
+
+            // Status stacked bar charts
+  const STATUS_DATA = [
+    { nome: 'Natal Spot',            disp: 29, res: 1, cont: 0, vend: 63 },
+    { nome: 'Itacare Spot',          disp: 16, res: 0, cont: 0, vend: 51 },
+    { nome: 'Novo Campeche Spot II', disp: 24, res: 0, cont: 0, vend: 27 },
+    { nome: 'Marista 144 Spot',       disp: 52, res: 0, cont: 0, vend: 98 },
+    { nome: 'Bonito Spot II',         disp: 15, res: 0, cont: 0, vend: 20 },
+    { nome: 'Barra Grande Spot',      disp: 1,  res: 0, cont: 0, vend: 59 },
+    { nome: 'Caragua Spot',           disp: 109,res: 0, cont: 0, vend: 25 },
+  ];
+  const statusValuePlugin = {
+    id: 'statusValues',
+    afterDatasetsDraw(chart) {
+      if (chart.config.type !== 'bar') return;
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      const colors = ['#16a34a','#f59e0b','#002D72','#FF5A4F'];
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        meta.data.forEach((bar, pi) => {
+          const val = ds.data[pi];
+          if (!val) return;
+          ctx.save();
+          ctx.font = 'bold 8px Segoe UI, Arial';
+          ctx.fillStyle = colors[di] || '#334155';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(val, bar.x + bar.width + 3, bar.y);
+          ctx.restore();
+        });
+      });
+    }
+  };
+  Chart.register(statusValuePlugin);
+  document.querySelectorAll('.status-chart-cell canvas').forEach(canvas => {
+    const idx = parseInt(canvas.dataset.idx);
+    const d = STATUS_DATA[idx];
+    new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: [d.nome],
+        datasets: [
+          { label: 'Disponivel', data: [d.disp],   backgroundColor: '#16a34a', stack: 'stack0' },
+          { label: 'Reservada',  data: [d.res],    backgroundColor: '#f59e0b', stack: 'stack0' },
+          { label: 'Contrato',    data: [d.cont],  backgroundColor: '#002D72', stack: 'stack0' },
+          { label: 'Vendida',    data: [d.vend],   backgroundColor: '#FF5A4F', stack: 'stack0' },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        scales: {
+          x: { stacked: true, ticks: { display: false }, grid: { display: false }, categoryPercentage: 0.3, barPercentage: 0.8 },
+          y: { stacked: true, ticks: { font: { size: 8 }, color: '#94a3b8' }, grid: { color: '#f1f5f9' }, min: 0 }
+        }
+      }
+    });
+  });  show(0);
+});
+dots.forEach(d => d.addEventListener('click', () => show(parseInt(d.dataset.index))));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); if (current < total - 1) show(current + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); if (current > 0) show(current - 1); }
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(total - 1);
+});
+</script>
+</body>
+</html>
